@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Overviews 引用分析報告｜健康2.0</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --teal-dark: #0F6E56; --teal-mid: #1D9E75; --teal-light: #5DCAA5;
+  --teal-pale: #E1F5EE; --amber: #BA7517; --amber-pale: #FAEEDA;
+  --gray-900: #1a1a1a; --gray-700: #444; --gray-500: #777;
+  --gray-300: #ccc; --gray-100: #f5f5f3; --gray-50: #fafaf8; --white: #fff;
+  --serif: 'Noto Serif TC', serif; --sans: 'Noto Sans TC', sans-serif;
+}
+body { font-family: var(--sans); background: var(--gray-50); color: var(--gray-900); line-height: 1.7; font-size: 15px; }
+
+/* Floating Nav */
+.floating-nav { position: fixed; top: 50%; right: 20px; transform: translateY(-50%); display: flex; flex-direction: column; gap: 6px; z-index: 100; }
+.nav-dot { display: flex; align-items: center; gap: 8px; cursor: pointer; text-decoration: none; justify-content: flex-end; }
+.nav-dot-circle { width: 8px; height: 8px; border-radius: 50%; background: var(--gray-300); transition: all 0.2s; flex-shrink: 0; }
+.nav-dot:hover .nav-dot-circle { background: var(--teal-mid); transform: scale(1.4); }
+.nav-dot-label { font-size: 11px; color: var(--gray-500); white-space: nowrap; opacity: 0; transition: opacity 0.2s; pointer-events: none; }
+.nav-dot:hover .nav-dot-label { opacity: 1; }
+
+.page { max-width: 860px; margin: 0 auto; padding: 3rem 2rem 6rem; }
+
+/* Header */
+.report-header { border-bottom: 2px solid var(--gray-900); padding-bottom: 2rem; margin-bottom: 2rem; }
+.report-tag { font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--teal-dark); margin-bottom: 1rem; }
+.report-title { font-family: var(--serif); font-size: 2.2rem; font-weight: 700; line-height: 1.3; color: var(--gray-900); margin-bottom: 0.75rem; }
+.report-sub { font-size: 14px; color: var(--gray-500); }
+
+/* Highlights */
+.highlights { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem; }
+.highlight-card { background: var(--white); border: 1px solid var(--gray-300); border-radius: 8px; padding: 1.25rem 1rem; text-align: center; }
+.highlight-card.accent { background: var(--teal-pale); border-color: #9FE1CB; }
+.highlight-num { font-family: var(--serif); font-size: 2rem; font-weight: 700; color: var(--teal-dark); line-height: 1; margin-bottom: 0.3rem; }
+.highlight-label { font-size: 12px; color: var(--gray-500); line-height: 1.4; }
+.highlight-sub { font-size: 11px; color: var(--teal-mid); font-weight: 600; margin-top: 4px; }
+
+/* Metrics */
+.metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--gray-300); border: 1px solid var(--gray-300); border-radius: 8px; overflow: hidden; margin-bottom: 3rem; }
+.metric { background: var(--white); padding: 1.25rem; text-align: center; }
+.metric-num { font-family: var(--serif); font-size: 2.2rem; font-weight: 700; color: var(--teal-dark); line-height: 1; margin-bottom: 0.4rem; }
+.metric-label { font-size: 12px; color: var(--gray-500); letter-spacing: 0.03em; }
+
+/* Chapter divider */
+.chapter-divider { display: flex; align-items: center; gap: 1rem; margin: 3.5rem 0 2rem; }
+.chapter-tag { font-size: 10px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--white); background: var(--gray-900); padding: 4px 10px; border-radius: 3px; white-space: nowrap; }
+.chapter-line { flex: 1; height: 1px; background: var(--gray-300); }
+.chapter-title-text { font-size: 12px; color: var(--gray-500); white-space: nowrap; }
+
+/* Section */
+.section { margin-bottom: 3.5rem; }
+.section-header { display: flex; align-items: baseline; gap: 1rem; margin-bottom: 1.5rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--gray-300); }
+.section-num { font-family: var(--serif); font-size: 1.8rem; font-weight: 700; color: var(--gray-300); line-height: 1; }
+.section-title { font-family: var(--serif); font-size: 1.15rem; font-weight: 600; color: var(--gray-900); }
+
+/* Insight block */
+.insight-block { margin-top: 1.25rem; display: flex; flex-direction: column; gap: 0.75rem; }
+.insight-row { display: flex; gap: 0.75rem; align-items: flex-start; font-size: 13px; line-height: 1.65; color: var(--gray-700); }
+.insight-badge { flex-shrink: 0; font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; background: var(--teal-pale); color: var(--teal-dark); padding: 2px 8px; border-radius: 3px; margin-top: 2px; }
+
+/* Bar charts */
+.bar-row { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+.bar-label { width: 105px; flex-shrink: 0; font-size: 13px; color: var(--gray-700); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bar-track { flex: 1; background: var(--gray-100); border-radius: 3px; height: 24px; }
+.bar-fill { height: 100%; border-radius: 3px; display: flex; align-items: center; justify-content: flex-end; padding-right: 10px; font-size: 12px; font-weight: 700; min-width: 40px; }
+.bar-count { font-size: 12px; color: var(--gray-500); width: 110px; text-align: right; flex-shrink: 0; }
+.group-label { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gray-500); margin: 1.2rem 0 0.6rem; }
+
+/* Table */
+.compare-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.compare-table th { text-align: left; padding: 8px 12px; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--gray-500); border-bottom: 1px solid var(--gray-300); }
+.compare-table th.right { text-align: right; }
+.compare-table td { padding: 10px 12px; border-bottom: 1px solid var(--gray-100); color: var(--gray-700); vertical-align: middle; }
+.compare-table td.right { text-align: right; }
+.compare-table tr:last-child td { border-bottom: none; }
+.val-cited { font-weight: 700; color: var(--teal-dark); }
+.val-diff { font-weight: 700; color: var(--amber); }
+
+/* KW bars */
+.kw-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.kw-label { width: 110px; flex-shrink: 0; font-size: 13px; color: var(--gray-700); }
+.kw-bars { flex: 1; display: flex; flex-direction: column; gap: 3px; }
+.kw-bar-wrap { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--gray-500); }
+.kw-bar-fill { height: 10px; border-radius: 2px; }
+
+/* Insight cards */
+.insight-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
+.insight-card { border-radius: 8px; padding: 1.25rem; border: 1px solid; }
+.insight-card.good { background: var(--teal-pale); border-color: #9FE1CB; }
+.insight-card.warn { background: var(--amber-pale); border-color: #FAC775; }
+.insight-card .ic-label { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 6px; }
+.insight-card.good .ic-label { color: var(--teal-dark); }
+.insight-card.warn .ic-label { color: var(--amber); }
+.insight-card .ic-val { font-size: 13px; color: var(--gray-900); line-height: 1.6; }
+
+/* Profile */
+.profile-card { background: var(--white); border: 1px solid var(--gray-300); border-radius: 8px; padding: 1.5rem; margin-bottom: 1.25rem; }
+.profile-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem; }
+.profile-item { font-size: 13px; line-height: 1.6; }
+.profile-label { font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--gray-500); margin-bottom: 3px; }
+
+/* Journey */
+.journey { display: flex; gap: 0; margin: 1rem 0; overflow-x: auto; }
+.journey-step { flex: 1; min-width: 90px; background: var(--teal-pale); border: 1px solid #9FE1CB; padding: 10px 8px; text-align: center; position: relative; font-size: 12px; color: var(--teal-dark); }
+.journey-step:not(:first-child)::before { content: '▶'; position: absolute; left: -10px; top: 50%; transform: translateY(-50%); color: var(--gray-300); font-size: 10px; }
+.journey-step-num { font-size: 10px; font-weight: 700; margin-bottom: 3px; }
+.journey-step-label { font-weight: 600; }
+.journey-step-sub { font-size: 10px; color: var(--teal-mid); margin-top: 2px; }
+
+/* Opportunity */
+.opp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+.opp-card { border-radius: 8px; padding: 1rem 1.25rem; border-left: 4px solid var(--teal-mid); background: var(--white); border-top: 1px solid var(--gray-300); border-right: 1px solid var(--gray-300); border-bottom: 1px solid var(--gray-300); }
+.opp-card-num { font-size: 10px; font-weight: 700; color: var(--teal-mid); letter-spacing: 0.08em; margin-bottom: 4px; }
+.opp-card-title { font-size: 13px; font-weight: 700; color: var(--gray-900); margin-bottom: 4px; }
+.opp-card-desc { font-size: 12px; color: var(--gray-700); line-height: 1.55; }
+
+/* Closing quote */
+.closing-quote { background: var(--gray-900); color: var(--white); border-radius: 8px; padding: 2rem; margin: 2rem 0; text-align: center; }
+.closing-quote-text { font-family: var(--serif); font-size: 1.05rem; line-height: 1.8; color: #e0e0e0; margin-bottom: 0.75rem; }
+.closing-quote-text strong { color: var(--teal-light); }
+.closing-quote-attr { font-size: 12px; color: var(--gray-500); }
+
+/* Action box */
+.action-box { background: var(--gray-900); color: var(--white); border-radius: 8px; padding: 2rem; margin-top: 3rem; }
+.action-box-title { font-family: var(--serif); font-size: 1.1rem; font-weight: 600; margin-bottom: 1.25rem; color: var(--white); }
+.action-list { list-style: none; display: flex; flex-direction: column; gap: 0.75rem; }
+.action-list li { display: flex; gap: 12px; font-size: 13px; line-height: 1.6; color: #ccc; }
+.action-num { flex-shrink: 0; width: 22px; height: 22px; background: var(--teal-dark); color: var(--white); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; margin-top: 2px; }
+.action-list strong { color: var(--white); }
+
+.note-box { font-size: 12px; color: var(--gray-500); background: var(--white); border-radius: 6px; padding: 10px 14px; margin-top: 1rem; border-left: 3px solid var(--gray-300); }
+
+footer { margin-top: 4rem; padding-top: 1.5rem; border-top: 1px solid var(--gray-300); font-size: 12px; color: var(--gray-500); display: flex; justify-content: space-between; }
+</style>
+</head>
+<body>
+
+<nav class="floating-nav">
+  <a class="nav-dot" href="#sec-highlights"><span class="nav-dot-label">核心發現</span><span class="nav-dot-circle"></span></a>
+  <a class="nav-dot" href="#sec-01"><span class="nav-dot-label">01 主題引用率</span><span class="nav-dot-circle"></span></a>
+  <a class="nav-dot" href="#sec-02"><span class="nav-dot-label">02 寫作格式</span><span class="nav-dot-circle"></span></a>
+  <a class="nav-dot" href="#sec-03"><span class="nav-dot-label">03 標題關鍵詞</span><span class="nav-dot-circle"></span></a>
+  <a class="nav-dot" href="#sec-04"><span class="nav-dot-label">04 作者</span><span class="nav-dot-circle"></span></a>
+  <a class="nav-dot" href="#sec-05"><span class="nav-dot-label">05 綜合規律</span><span class="nav-dot-circle"></span></a>
+  <a class="nav-dot" href="#sec-06"><span class="nav-dot-label">06 內容特性</span><span class="nav-dot-circle"></span></a>
+  <a class="nav-dot" href="#sec-08"><span class="nav-dot-label">07 機會觀察</span><span class="nav-dot-circle"></span></a>
+  <a class="nav-dot" href="#sec-action"><span class="nav-dot-label">編輯建議</span><span class="nav-dot-circle"></span></a>
+  <a class="nav-dot" href="#sec-appendix"><span class="nav-dot-label">附錄</span><span class="nav-dot-circle"></span></a>
+</nav>
+
+<div class="page">
+
+  <header class="report-header">
+    <div class="report-tag">健康2.0 ｜ SEO 內容策略</div>
+    <h1 class="report-title">AI Overviews 引用規律分析</h1>
+    <p class="report-sub">資料區間：2025 減醣、保骨、好眠主題 ＋ 2026 SEO 關鍵字追蹤｜分析樣本：220 筆關鍵字 / 66 篇不重複文章｜AIO 狀態快照記錄時間：2026年3月19日</p>
+    <p class="report-sub" style="margin-top:6px;font-size:13px;color:#999;">※ AIO 引用來源會隨時間輪換，本分析反映快照時間點的內容特性，結論可作為持續優化的方向依據。</p>
+  </header>
+
+  <!-- 核心發現速覽 -->
+  <section id="sec-highlights">
+    <div class="group-label" style="margin-top:0;">核心發現速覽</div>
+    <div class="highlights">
+      <div class="highlight-card accent"><div class="highlight-num">35%</div><div class="highlight-label">整體 AIO 引用率</div><div class="highlight-sub">220 筆中 77 筆被引用</div></div>
+      <div class="highlight-card accent"><div class="highlight-num">85%</div><div class="highlight-label">最高主題引用率</div><div class="highlight-sub">減醣主題（11/13 筆）</div></div>
+      <div class="highlight-card accent"><div class="highlight-num">6</div><div class="highlight-label">單篇最高命中關鍵字數</div><div class="highlight-sub">半夜醒來 /medical/361725</div></div>
+      <div class="highlight-card"><div class="highlight-num">38</div><div class="highlight-label">不重複被引用文章數</div><div class="highlight-sub">平均每篇命中 2 個關鍵字</div></div>
+      <div class="highlight-card"><div class="highlight-num">0%</div><div class="highlight-label">媒體名稱署名引用率</div><div class="highlight-sub">具名作者平均高出 80% 以上</div></div>
+      <div class="highlight-card"><div class="highlight-num">20%</div><div class="highlight-label">含年份關鍵字佔比</div><div class="highlight-sub">77 筆中 15 筆含「2026」</div></div>
+    </div>
+  </section>
+
+  <div class="metrics">
+    <div class="metric"><div class="metric-num">220</div><div class="metric-label">追蹤關鍵字筆數</div></div>
+    <div class="metric"><div class="metric-num">77</div><div class="metric-label">🟢 有引用</div></div>
+    <div class="metric"><div class="metric-num">35%</div><div class="metric-label">整體引用率</div></div>
+    <div class="metric"><div class="metric-num">38</div><div class="metric-label">不重複被引用文章數</div></div>
+  </div>
+
+  <div class="chapter-divider"><span class="chapter-tag">Chapter 1</span><span class="chapter-line"></span><span class="chapter-title-text">主題與格式分析</span></div>
+
+  <section class="section" id="sec-01">
+    <div class="section-header"><span class="section-num">01</span><h2 class="section-title">哪些主題最容易被引用？</h2></div>
+    <div id="cat-bars"></div>
+    <div class="note-box">主題排行前三：失眠（11）、減醣（11）、節日／過年拜拜（8）——幾乎都是「具體、有時令性」或「健康剛需」議題。好眠與醫療衛教 AI 有在回答但部分選擇了其他來源，仍有成長空間。</div>
+    <div class="insight-block">
+      <div class="insight-row"><span class="insight-badge">解讀一</span><span><strong>保骨與減醣是 AIO 最親睞的主題。</strong>保骨 100%、減醣 85%，兩者共同特徵是「操作指引明確、有具體數字可引用」——補鈣幾毫克、血糖降幾 %，AIO 擅長把這類數字直接摘入答案框。</span></div>
+      <div class="insight-row"><span class="insight-badge">解讀二</span><span><strong>好眠是最值得突破的版位。</strong>引用率 13% 不代表沒機會，而是 AI 有在回答睡眠問題、只是目前選了別人。站內已有「半夜醒來」成功案例可複製，關鍵在結構升級而非重新選題。</span></div>
+    </div>
+  </section>
+
+  <section class="section" id="sec-02">
+    <div class="section-header"><span class="section-num">02</span><h2 class="section-title">寫作格式：結構越細，越容易被引用</h2></div>
+    <table class="compare-table">
+      <thead><tr><th>結構指標</th><th class="right">有引用（平均）</th><th class="right">未引用（平均）</th><th class="right">差距</th></tr></thead>
+      <tbody>
+        <tr><td>H2 數量</td><td class="right val-cited">11.0</td><td class="right">9.5</td><td class="right val-diff">+1.5</td></tr>
+        <tr><td>H3 數量</td><td class="right val-cited">30.8</td><td class="right">26.5</td><td class="right val-diff">+4.3</td></tr>
+        <tr><td>清單數量</td><td class="right val-cited">39 條以上</td><td class="right">較少</td><td class="right val-diff">明顯多</td></tr>
+        <tr><td>表格數量</td><td class="right val-cited">2 個以上</td><td class="right">較少</td><td class="right val-diff">明顯多</td></tr>
+      </tbody>
+    </table>
+    <div class="note-box">AIO 是「片段擷取」邏輯——H3 每多一個，等於多提供一個可被 AI 直接引用的答案單元。</div>
+    <div class="insight-block">
+      <div class="insight-row"><span class="insight-badge">解讀一</span><span><strong>H3 是 AIO 的擷取單位。</strong>AIO 不讀整篇文章，它掃描結構化的區塊。每個 H3 加上 2-3 句說明，等於給 AI 一個可直接打包引用的「答案模組」。H3 ≥ 30 是目前被引用文章的平均門檻。</span></div>
+      <div class="insight-row"><span class="insight-badge">解讀二</span><span><strong>表格的引用效率最高。</strong>「A 食物含 X mg 鈣、B 食物含 Y mg 鈣」這種比較表，AIO 可以直接原樣呈現給使用者，不需要改寫。每篇至少 2 個表格是被引用文章的共同特徵。</span></div>
+    </div>
+  </section>
+
+  <div class="chapter-divider"><span class="chapter-tag">Chapter 2</span><span class="chapter-line"></span><span class="chapter-title-text">標題與作者分析</span></div>
+
+  <section class="section" id="sec-03">
+    <div class="section-header"><span class="section-num">03</span><h2 class="section-title">標題關鍵詞：哪些詞素拉高引用率？</h2></div>
+    <div id="kw-chart"></div>
+    <div class="note-box">「怎麼辦」在未引用文出現率反而是有引用文的 4 倍——開放感問句沒有明確答案，AI 傾向不引用。</div>
+    <div class="insight-block">
+      <div class="insight-row"><span class="insight-badge">解讀一</span><span><strong>「一次看」是最強的 AIO 訊號詞。</strong>出現率有引用文 58%，這個詞彙代表文章結構完整、涵蓋多角度——正是 AIO 偏好的全方位解答格式。</span></div>
+      <div class="insight-row"><span class="insight-badge">解讀二</span><span><strong>「排行」是零失誤的引用觸發詞。</strong>含「排行」的關鍵字在有引用文出現率 8%、未引用文 0%——只要標題有排行，AIO 幾乎必引用，因為清單型答案正是 AI 最好擷取的格式。</span></div>
+    </div>
+  </section>
+
+  <section class="section" id="sec-04">
+    <div class="section-header"><span class="section-num">04</span><h2 class="section-title">作者：具名撰寫引用率顯著高於媒體名稱署名</h2></div>
+    <div class="group-label">引用率前三名</div>
+    <div id="author-high"></div>
+    <div class="group-label" style="margin-top:1.5rem;">其他作者與媒體名稱署名</div>
+    <div id="author-low"></div>
+    <div class="note-box" style="margin-top:1rem;">以「健康2.0」媒體名稱署名的文章引用率為 0%。建議所有文章優先掛具名作者，醫療衛教版位尤其需要。</div>
+    <div class="insight-block">
+      <div class="insight-row"><span class="insight-badge">解讀一</span><span><strong>具名作者是 E-E-A-T 的最直接體現。</strong>Google 的 E-E-A-T 評分機制把「作者是誰」視為重要信號。具名記者 + 諮詢醫師的組合，讓文章同時具備媒體可信度與醫療專業度。</span></div>
+      <div class="insight-row"><span class="insight-badge">解讀二</span><span><strong>引用率前三名作者的共同特徵。</strong>羅以容（83%）、梁萱琪（80%）、丁彥伶（75%）——這三位的文章通常諮詢 2 位以上醫師、H3 結構清晰、偏向「操作型」而非「知識型」內容，值得作為全站撰稿標準參考。</span></div>
+    </div>
+  </section>
+
+  <div class="chapter-divider"><span class="chapter-tag">Chapter 3</span><span class="chapter-line"></span><span class="chapter-title-text">規律與特性</span></div>
+
+  <section class="section" id="sec-05">
+    <div class="section-header"><span class="section-num">05</span><h2 class="section-title">綜合規律：最容易被引用的組合</h2></div>
+    <div class="insight-grid">
+      <div class="insight-card good"><div class="ic-label">主題</div><div class="ic-val">節慶節氣、減醣、養生、保骨<br>→ 生活實用、有明確操作步驟</div></div>
+      <div class="insight-card good"><div class="ic-label">寫作格式</div><div class="ic-val">H2 ≥ 10、H3 ≥ 30<br>清單 ≥ 35 條、表格 2 個以上</div></div>
+      <div class="insight-card good"><div class="ic-label">標題語氣</div><div class="ic-val">年份開頭 ＋ 具體數字<br>＋「一次看／禁忌／排行／最有效」</div></div>
+      <div class="insight-card good"><div class="ic-label">作者</div><div class="ic-val">具名記者或編輯撰寫<br>引用率比媒體名稱署名高出 80% 以上</div></div>
+    </div>
+    <div class="insight-card warn" style="margin-top:0;">
+      <div class="ic-label">最難進 AIO 的組合</div>
+      <div class="ic-val">泛型衛教長文 ＋ 學術描述語氣 ＋ 媒體名稱「健康2.0」署名 ＋ 無時效性主題 → 引用率接近 0%</div>
+    </div>
+  </section>
+
+  <section class="section" id="sec-06">
+    <div class="section-header"><span class="section-num">06</span><h2 class="section-title">被引用文章的共同特性</h2></div>
+
+    <div class="group-label">各頻道路徑分析（泡泡大小 = 被引用筆數）</div>
+    <div id="radar-wrap" style="display:flex;justify-content:center;margin:1.5rem 0;"><canvas id="radarChart" width="520" height="360"></canvas></div>
+
+    <div style="margin-bottom:1.5rem;">
+      <div style="font-size:12px;font-weight:600;color:var(--gray-500);letter-spacing:0.05em;text-transform:uppercase;margin-bottom:0.75rem;">頻道路徑引用率</div>
+      <table class="compare-table">
+        <thead><tr><th>頻道路徑</th><th class="right">引用率</th><th class="right">特性</th></tr></thead>
+        <tbody>
+          <tr><td>/tcm/（中醫）</td><td class="right val-cited">100%</td><td class="right">樣本少但全中</td></tr>
+          <tr><td>/life/（生活節日）</td><td class="right val-cited">47%</td><td class="right">時令性強、需求明確</td></tr>
+          <tr><td>/regimen/（養生保健）</td><td class="right val-cited">35%</td><td class="right">操作步驟清楚</td></tr>
+          <tr><td>/medical/（醫療）</td><td class="right val-cited">32%</td><td class="right">時效性疾病＋睡眠警訊為主力</td></tr>
+          <tr><td>/nutrition/（營養）</td><td class="right val-cited">31%</td><td class="right">清單型、飲食建議</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div style="font-size:12px;font-weight:600;color:var(--gray-500);letter-spacing:0.05em;text-transform:uppercase;margin-bottom:0.75rem;">四大內容特性</div>
+    <div class="insight-grid" style="grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:1.5rem;">
+      <div class="insight-card good"><div class="ic-label">① 單一主題＋多角度長尾</div><div class="ic-val" style="font-size:12px;">平均每篇同時被 2 個關鍵字命中，最高 6 個。一篇涵蓋「原因、症狀、方法、禁忌、警訊」，AIO 可對應多種搜尋意圖分別擷取。</div></div>
+      <div class="insight-card good"><div class="ic-label">② 強時效性與在地性</div><div class="ic-val" style="font-size:12px;">77 筆中有 15 筆（20%）含「2026」年份，涵蓋節日、敬老金、補助政策。AIO 對年度更新型資訊偏好明顯。</div></div>
+      <div class="insight-card good"><div class="ic-label">③ 問題導向結構</div><div class="ic-val" style="font-size:12px;">約 19 個關鍵字含「怎麼辦、是什麼、為什麼、原因、症狀、禁忌、功效、方法」——文章直接命中使用者提問，AIO 對應擷取效率高。</div></div>
+      <div class="insight-card good"><div class="ic-label">④ 飲食清單型內容</div><div class="ic-val" style="font-size:12px;">9 個關鍵字屬「食物、飲食、菜單、吃什麼、喝什麼」類。AIO 偏好引用「列出可吃／不可吃＋解釋為什麼」的清單型內容。</div></div>
+    </div>
+
+    <div style="font-size:12px;font-weight:600;color:var(--gray-500);letter-spacing:0.05em;text-transform:uppercase;margin-bottom:0.75rem;">三層次寫作策略</div>
+    <table class="compare-table">
+      <thead><tr><th style="width:80px;">層次</th><th>做法</th><th>說明</th></tr></thead>
+      <tbody>
+        <tr><td style="font-weight:600;color:var(--teal-dark);">標題層</td><td>置入年份／疑問句／排行榜／極致詞</td><td>至少命中 8 種模板之一，觸發 AIO 引用訊號</td></tr>
+        <tr><td style="font-weight:600;color:var(--teal-dark);">內文層</td><td>一篇涵蓋同主題多種長尾問法</td><td>同義詞、原因、症狀、方法、禁忌、警訊全覆蓋</td></tr>
+        <tr><td style="font-weight:600;color:var(--teal-dark);">主題層</td><td>選擇強時效或強剛需議題</td><td>節日政策、年度疫苗、睡眠、血糖、減重、補鈣、腸胃</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <div class="chapter-divider"><span class="chapter-tag">Chapter 4</span><span class="chapter-line"></span><span class="chapter-title-text">機會觀察</span></div>
+
+  <section class="section" id="sec-08">
+    <div class="section-header"><span class="section-num">07</span><h2 class="section-title">機會觀察：下一步可以進場的方向</h2></div>
+    <div class="opp-grid">
+      <div class="opp-card"><div class="opp-card-num">機會 01</div><div class="opp-card-title">好眠版位結構升級</div><div class="opp-card-desc">已有成功案例（半夜醒來），但多數好眠文章結構較弱。優先對 30 篇追蹤文章逐篇做 H3 切細、加比較表格，不需要重新選題。</div></div>
+      <div class="opp-card"><div class="opp-card-num">機會 02</div><div class="opp-card-title">時效性疾病快速佈局</div><div class="opp-card-desc">食人菌、漢他病毒的引用規律顯示，新興疾病爆發期間搶先發佈、標題含年份＋症狀三件套，引用率極高。建立疫情爆發快速應對 SOP。</div></div>
+      <div class="opp-card"><div class="opp-card-num">機會 03</div><div class="opp-card-title">血糖管理深度系列</div><div class="opp-card-desc">血糖相關在 /medical/ 路徑被引用 3 篇、命中 5 個關鍵字，是醫療版位表現最好的子主題。可規劃「血糖管理完整系列」，每篇覆蓋不同長尾問法。</div></div>
+      <div class="opp-card"><div class="opp-card-num">機會 04</div><div class="opp-card-title">節慶年份標題全面更新</div><div class="opp-card-desc">習俗生活引用率 48%，且 20% 被引用關鍵字含年份。每年節慶前 4-6 週把舊文標題加上年份、更新資訊，是最低成本、最高回報的 AIO 優化操作。</div></div>
+      <div class="opp-card"><div class="opp-card-num">機會 05</div><div class="opp-card-title">具名作者全面落地</div><div class="opp-card-desc">目前仍有文章以「健康2.0」媒體名稱署名，引用率 0%。把存量文章的署名逐步改為具名作者，是不需要重新寫稿、直接提升 E-E-A-T 的操作。</div></div>
+      <div class="opp-card"><div class="opp-card-num">機會 06</div><div class="opp-card-title">營養主題清單型加強</div><div class="opp-card-desc">營養版位引用率 23%，但「排行」「比較」型關鍵字引用率接近 100%。把現有營養文章加入食物排行表、補充劑比較表，是提升引用率的最快手段。</div></div>
+    </div>
+    <div class="insight-block" style="margin-top:1.25rem;">
+      <div class="insight-row"><span class="insight-badge">補足建議</span><span><strong>建立 AIO 追蹤的固定節奏。</strong>本次分析是 3/19 的單一快照，建議每季做一次批次查驗，追蹤哪些文章進出 AIO、哪些競品文章新進榜，才能動態調整選題策略。</span></div>
+    </div>
+  </section>
+
+  <!-- Action box -->
+  <div class="action-box" id="sec-action">
+    <div class="action-box-title">給編輯團隊的具體建議</div>
+    <ul class="action-list">
+      <li>
+        <span class="action-num">1</span>
+        <span>
+          <strong>標題套用 8 種 AIO 引用模板：</strong>分析 77 筆被引用關鍵字後，歸納出以下有效公式——每篇標題至少命中其中一種，引用機率顯著提升。
+          <table style="margin-top:10px;width:100%;border-collapse:collapse;font-size:12px;">
+            <thead><tr>
+              <td style="padding:6px 10px;color:#9FE1CB;font-weight:700;width:100px;">模板類型</td>
+              <td style="padding:6px 10px;color:#9FE1CB;font-weight:700;">公式說明</td>
+              <td style="padding:6px 10px;color:#9FE1CB;font-weight:700;">健康2.0 適用範例</td>
+            </tr></thead>
+            <tbody>
+              <tr style="border-top:0.5px solid rgba(255,255,255,0.1);"><td style="padding:6px 10px;color:#9FE1CB;font-weight:500;">① 年份前置</td><td style="padding:6px 10px;color:#aaa;">2026 ＋ 節慶／政策／疾病</td><td style="padding:6px 10px;color:#fff;">2026 過年拜拜供品清單＋5大禁忌一次看</td></tr>
+              <tr style="border-top:0.5px solid rgba(255,255,255,0.1);"><td style="padding:6px 10px;color:#9FE1CB;font-weight:500;">② 疑問句直球</td><td style="padding:6px 10px;color:#aaa;">把使用者的問題原文化為標題</td><td style="padding:6px 10px;color:#fff;">半夜一直醒來睡不著是身體警訊？醫解析 6 大原因一次看</td></tr>
+              <tr style="border-top:0.5px solid rgba(255,255,255,0.1);"><td style="padding:6px 10px;color:#9FE1CB;font-weight:500;">③ 排行／比較</td><td style="padding:6px 10px;color:#aaa;">排行、比較、A 或 B</td><td style="padding:6px 10px;color:#fff;">補鈣食物排行！吃什麼補鈣最快？醫推這 5 種效果差很大</td></tr>
+              <tr style="border-top:0.5px solid rgba(255,255,255,0.1);"><td style="padding:6px 10px;color:#9FE1CB;font-weight:500;">④ 極致詞</td><td style="padding:6px 10px;color:#aaa;">最快、最低、最好 ＋ 行動動詞</td><td style="padding:6px 10px;color:#fff;">降血糖最快的方法？飯後走路 10 分鐘勝過藥物</td></tr>
+              <tr style="border-top:0.5px solid rgba(255,255,255,0.1);"><td style="padding:6px 10px;color:#9FE1CB;font-weight:500;">⑤ 功效＋禁忌</td><td style="padding:6px 10px;color:#aaa;">同一篇談好處與不能做的事</td><td style="padding:6px 10px;color:#fff;">陳皮功效與禁忌一次看！這 3 種體質喝多恐傷身</td></tr>
+              <tr style="border-top:0.5px solid rgba(255,255,255,0.1);"><td style="padding:6px 10px;color:#9FE1CB;font-weight:500;">⑥ 症狀＋原因</td><td style="padding:6px 10px;color:#aaa;">症狀、原因、傳染、警訊</td><td style="padding:6px 10px;color:#fff;">空腹血糖偏高症狀有哪些？醫揭 4 大原因：恐與糖尿病、腎病有關</td></tr>
+              <tr style="border-top:0.5px solid rgba(255,255,255,0.1);"><td style="padding:6px 10px;color:#9FE1CB;font-weight:500;">⑦ 動作＋對象</td><td style="padding:6px 10px;color:#aaa;">動詞 ＋ 名詞，可執行的健康建議</td><td style="padding:6px 10px;color:#fff;">飯後走路降血糖！研究證實這樣走 10 分鐘效果最好</td></tr>
+              <tr style="border-top:0.5px solid rgba(255,255,255,0.1);"><td style="padding:6px 10px;color:#9FE1CB;font-weight:500;">⑧ 主題詞精準</td><td style="padding:6px 10px;color:#aaa;">極短主題詞，但內文夠完整權威</td><td style="padding:6px 10px;color:#fff;">奇亞籽功效、吃法與禁忌，一篇完整整理</td></tr>
+            </tbody>
+          </table>
+        </span>
+      </li>
+      <li><span class="action-num">2</span><span><strong>H3 切細：</strong>每篇文章 H3 目標 30 個以上，每個 H3 都是一個獨立可被 AI 擷取的答案單元。</span></li>
+      <li><span class="action-num">3</span><span><strong>必加表格：</strong>每篇至少放 2 個比較表格或整理表格，AIO 特別偏好可直接擷取的結構化資料。</span></li>
+      <li><span class="action-num">4</span><span><strong>具名署名：</strong>所有文章掛具名作者，停止使用「健康2.0」媒體名稱署名，引用率差距達 80% 以上。</span></li>
+      <li><span class="action-num">5</span><span><strong>好眠版位：有突破空間，優先對標成功案例。</strong>好眠主題的 AIO 競爭激烈，AI 有在回答這類問題，代表需求存在。建議以站內已被引用的好眠文章為模板，逐篇對照結構進行升級——重點在 H2 全面問句化、H3 增加到 30 個以上、引用官方或研究來源。</span></li>
+      <li>
+        <span class="action-num">6</span>
+        <span>
+          <strong>醫療版位：策略重新定位。</strong>AIO 在醫療類查詢上結構性優先引用官方機構，媒體內容難以競爭。以下數據說明原因：
+          <table style="margin-top:10px;width:100%;border-collapse:collapse;font-size:12px;">
+            <thead><tr><td style="padding:6px 10px;color:#9FE1CB;font-weight:700;">面向</td><td style="padding:6px 10px;color:#9FE1CB;font-weight:700;">說明</td></tr></thead>
+            <tbody>
+              <tr style="border-top:0.5px solid rgba(255,255,255,0.1);"><td style="padding:6px 10px;color:#aaa;white-space:nowrap;">AIO 偏好來源</td><td style="padding:6px 10px;color:#fff;">衛福部、疾管署、國民健康署、Mayo Clinic、各大醫學會——這類官方與醫療機構來源在醫療查詢中佔據 AIO 引用的主要位置</td></tr>
+              <tr style="border-top:0.5px solid rgba(255,255,255,0.1);">
+                <td style="padding:6px 10px;color:#aaa;white-space:nowrap;">健康2.0 現況</td>
+                <td style="padding:6px 10px;color:#fff;">醫療版位（/medical/）共追蹤 <strong style="color:#fff;">69 筆</strong>，22 筆被引用，<strong style="color:#9FE1CB;">引用率 32%</strong>，不重複被引用文章共 8 篇：
+                  <ul style="margin:8px 0 0 0;padding-left:1.2em;line-height:2;">
+                    <li>/medical/337397 — 空腹血糖偏高、空腹血糖偏高症狀、空腹血糖升高的原因（3 個關鍵字）</li>
+                    <li>/medical/357552 — 吃飯順序 血糖（1 個關鍵字）</li>
+                    <li>/medical/357506 — 降血糖最快的方法（1 個關鍵字）</li>
+                    <li>/medical/360555 — 淺眠原因、為什麼淺眠（2 個關鍵字）</li>
+                    <li>/medical/361725 — 半夜醒來原因、怎麼辦、很多次、是什麼原因、身體警訊、夜醒（<strong style="color:#9FE1CB;">6 個，全站最高</strong>）</li>
+                    <li>/medical/361489 — 腦袋停不下來怎麼睡（1 個關鍵字）</li>
+                    <li>/medical/361618 — 2026食人菌、食人菌症狀、食人菌傳染途徑、食人菌、食人菌是什麼（5 個關鍵字）</li>
+                    <li>/medical/362751 — 漢他病毒人傳人、漢他病毒傳染、漢他病毒死亡率（3 個關鍵字）</li>
+                  </ul>
+                </td>
+              </tr>
+              <tr style="border-top:0.5px solid rgba(255,255,255,0.1);"><td style="padding:6px 10px;color:#aaa;white-space:nowrap;">資源建議</td><td style="padding:6px 10px;color:#fff;">醫療版位引用率 32% 與整體相近，並非難以突破。被引用的 8 篇以<strong style="color:#9FE1CB;">時效性疾病（食人菌、漢他病毒）、血糖管理、睡眠警訊</strong>為主，建議往這三個方向深耕，而非泛型衛教文。</td></tr>
+            </tbody>
+          </table>
+        </span>
+      </li>
+    </ul>
+  </div>
+
+
+
+  <!-- Appendix -->
+  <section class="section" id="sec-appendix" style="margin-top:3rem;">
+    <div class="section-header">
+      <span class="section-num" style="color:var(--teal-light);">附錄</span>
+      <h2 class="section-title">最成功案例解析：全站被引用關鍵字數最多的文章</h2>
+    </div>
+    <div style="background:var(--white);border:1px solid var(--gray-300);border-radius:8px;padding:1.5rem;margin-bottom:1.5rem;">
+      <div style="font-size:12px;color:var(--gray-500);margin-bottom:6px;">文章標題</div>
+      <div style="font-size:1.05rem;font-weight:600;color:var(--gray-900);line-height:1.5;">半夜醒來是身體在求救？醫曝夜醒原因：恐與糖尿病、腦部退化有關</div>
+      <div style="margin-top:10px;display:flex;gap:12px;flex-wrap:wrap;">
+        <span style="font-size:12px;background:var(--teal-pale);color:var(--teal-dark);padding:3px 10px;border-radius:3px;font-weight:500;">同時被 6 個關鍵字引用（全站最高）</span>
+        <span style="font-size:12px;background:var(--gray-100);color:var(--gray-700);padding:3px 10px;border-radius:3px;">作者：高麗玲｜/medical/ 頻道</span>
+        <span style="font-size:12px;background:var(--gray-100);color:var(--gray-700);padding:3px 10px;border-radius:3px;">諮詢醫師：3 位（西醫 2＋中醫 1）</span>
+      </div>
+    </div>
+    <table class="compare-table" style="margin-bottom:1.5rem;">
+      <thead><tr><th style="width:140px;">成功要素</th><th>說明</th></tr></thead>
+      <tbody>
+        <tr><td style="font-weight:500;color:var(--teal-dark);">標題公式</td><td>具體場景痛點「半夜醒來」＋ 疑問句觸發搜尋動機 ＋「醫曝」背書 ＋ 疾病警訊框架（糖尿病、腦部退化）</td></tr>
+        <tr><td style="font-weight:500;color:var(--teal-dark);">H2 結構</td><td>11 個 H2 全部為問句格式，每個 H2 本身就是使用者會搜尋的問題，AIO 可直接對應擷取</td></tr>
+        <tr><td style="font-weight:500;color:var(--teal-dark);">多角度覆蓋</td><td>一篇同時回答「原因、症狀、疾病警訊、改善方法、就醫時機、中醫觀點」，涵蓋同主題多種搜尋意圖</td></tr>
+        <tr><td style="font-weight:500;color:var(--teal-dark);">官方資料引用</td><td>明確引用國家衛生研究院、糖尿病關懷基金會、國立中正大學並附連結，E-E-A-T 信號強</td></tr>
+        <tr><td style="font-weight:500;color:var(--teal-dark);">被引用的 6 個關鍵字</td><td>夜醒、半夜醒來原因、半夜醒來怎麼辦、半夜醒來很多次、半夜醒來是什麼原因、半夜醒來身體警訊</td></tr>
+      </tbody>
+    </table>
+    <div class="note-box">此文章可作為好眠版位其他文章的升級模板——H2 全面問句化、引用官方來源、一篇覆蓋同主題多種長尾問法，是複製成功的核心策略。</div>
+  </section>
+
+  <footer><span>健康2.0 SEO 內容策略團隊</span><span>2026</span></footer>
+</div>
+
+<script>
+function makeBar(id, data) {
+  const c = document.getElementById(id); if (!c) return;
+  data.forEach(d => {
+    const row = document.createElement('div'); row.className = 'bar-row';
+    let fc = '#9FE1CB', tc = '#0F6E56';
+    if (d.rate >= 75) { fc = '#0F6E56'; tc = '#fff'; }
+    else if (d.rate >= 50) { fc = '#1D9E75'; tc = '#fff'; }
+    else if (d.rate >= 25) { fc = '#5DCAA5'; tc = '#085041'; }
+    else { fc = '#D3D1C7'; tc = '#444'; }
+    row.innerHTML = `<div class="bar-label" title="${d.label}">${d.label}</div><div class="bar-track"><div class="bar-fill" style="width:${Math.max(d.rate,6)}%;background:${fc};color:${tc}">${d.rate}%</div></div><div class="bar-count">${d.n}</div>`;
+    c.appendChild(row);
+  });
+}
+function fmt(a,b) { return b===null ? a : `${a} 篇／共 ${b} 篇`; }
+
+makeBar('cat-bars', [
+  {label:'保骨',    rate:100, n:fmt(3,3)},
+  {label:'減醣',    rate:85,  n:fmt(11,13)},
+  {label:'養生',    rate:70,  n:fmt(7,10)},
+  {label:'習俗生活', rate:48,  n:fmt(24,50)},
+  {label:'即時',    rate:40,  n:fmt(4,10)},
+  {label:'營養',    rate:23,  n:fmt(12,52)},
+  {label:'好眠',    rate:13,  n:fmt(4,30)},
+  {label:'醫療',    rate:32,  n:fmt(22,69)},
+]);
+makeBar('author-high', [
+  {label:'羅以容', rate:83, n:fmt(5,6)},
+  {label:'梁萱琪', rate:80, n:fmt(4,5)},
+  {label:'丁彥伶', rate:75, n:fmt(6,8)},
+]);
+makeBar('author-low', [
+  {label:'其他具名作者', rate:38, n:'平均'},
+  {label:'健康2.0 署名', rate:0,  n:fmt(0,4)},
+]);
+
+const kwData = [
+  {label:'一次看',     cited:58, nc:50},
+  {label:'含 2026',   cited:47, nc:42},
+  {label:'吃／喝',    cited:37, nc:21},
+  {label:'禁忌',      cited:37, nc:25},
+  {label:'飲食／菜單', cited:26, nc:17},
+  {label:'最有效／最快',cited:16, nc:4},
+  {label:'排行',      cited:8,  nc:0},
+  {label:'怎麼辦',    cited:5,  nc:21},
+];
+const kwC = document.getElementById('kw-chart');
+kwData.forEach(d => {
+  const row = document.createElement('div'); row.className = 'kw-row';
+  row.innerHTML = `<div class="kw-label">${d.label}</div><div class="kw-bars"><div class="kw-bar-wrap"><div class="kw-bar-fill" style="width:${d.cited*2.5}px;background:#1D9E75;"></div><span style="color:#1D9E75;font-weight:600;">有引用 ${d.cited}%</span></div><div class="kw-bar-wrap"><div class="kw-bar-fill" style="width:${d.nc*2.5}px;background:#D3D1C7;"></div><span>未引用 ${d.nc}%</span></div></div>`;
+  kwC.appendChild(row);
+});
+
+/* Bubble Chart */
+(function() {
+  const canvas = document.getElementById('radarChart'); if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const PAD = { top: 40, right: 120, bottom: 60, left: 60 };
+  const cW = W - PAD.left - PAD.right;
+  const cH = H - PAD.top - PAD.bottom;
+
+  // Real data: {label, tracked, citedRate, avgHit, citedCount}
+  const data = [
+    {label:'/tcm/',       tracked:4,  citedRate:100, avgHit:4.0, citedCount:4,  color:'#0F6E56'},
+    {label:'/life/',      tracked:49, citedRate:47,  avgHit:1.8, citedCount:23, color:'#E05C2A'},
+    {label:'/regimen/',   tracked:23, citedRate:35,  avgHit:1.6, citedCount:8,  color:'#2A6EBA'},
+    {label:'/medical/',   tracked:69, citedRate:32,  avgHit:2.8, citedCount:22, color:'#9B27AF'},
+    {label:'/nutrition/', tracked:64, citedRate:31,  avgHit:1.7, citedCount:20, color:'#C8A800'},
+  ];
+
+  // Axes: x = 追蹤筆數 (0–80), y = 引用率 (0–110%), bubble = 被引用筆數
+  const xMax = 80, yMax = 110;
+  const maxCited = Math.max(...data.map(d => d.citedCount));
+
+  function toX(v) { return PAD.left + (v / xMax) * cW; }
+  function toY(v) { return PAD.top + (1 - v / yMax) * cH; }
+  function bubbleR(n) { return 8 + (n / maxCited) * 28; }
+
+  // Grid lines
+  ctx.strokeStyle = '#e8e8e8'; ctx.lineWidth = 1;
+  [0, 20, 40, 60, 80].forEach(x => {
+    ctx.beginPath(); ctx.moveTo(toX(x), PAD.top); ctx.lineTo(toX(x), PAD.top + cH); ctx.stroke();
+    ctx.fillStyle = '#999'; ctx.font = '11px Noto Sans TC,sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+    ctx.fillText(x, toX(x), PAD.top + cH + 8);
+  });
+  [0, 25, 50, 75, 100].forEach(y => {
+    ctx.beginPath(); ctx.moveTo(PAD.left, toY(y)); ctx.lineTo(PAD.left + cW, toY(y)); ctx.stroke();
+    ctx.fillStyle = '#999'; ctx.font = '11px Noto Sans TC,sans-serif';
+    ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+    ctx.fillText(y + '%', PAD.left - 8, toY(y));
+  });
+
+  // Axes labels
+  ctx.fillStyle = '#444'; ctx.font = '12px Noto Sans TC,sans-serif';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+  ctx.fillText('追蹤筆數', PAD.left + cW / 2, PAD.top + cH + 32);
+  ctx.save(); ctx.translate(16, PAD.top + cH / 2); ctx.rotate(-Math.PI / 2);
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText('引用率', 0, 0); ctx.restore();
+
+  // Average line
+  const avgRate = 35;
+  ctx.setLineDash([4, 4]); ctx.strokeStyle = '#ccc'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(PAD.left, toY(avgRate)); ctx.lineTo(PAD.left + cW, toY(avgRate)); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle = '#aaa'; ctx.font = '10px Noto Sans TC,sans-serif';
+  ctx.textAlign = 'left'; ctx.textBaseline = 'bottom';
+  ctx.fillText('整體平均 35%', PAD.left + 4, toY(avgRate) - 3);
+
+  // Bubbles
+  data.forEach(d => {
+    const x = toX(d.tracked), y = toY(d.citedRate), r = bubbleR(d.citedCount);
+    ctx.beginPath(); ctx.arc(x, y, r, 0, 2 * Math.PI);
+    ctx.fillStyle = d.color + '55'; ctx.fill();
+    ctx.strokeStyle = d.color; ctx.lineWidth = 2; ctx.stroke();
+    ctx.fillStyle = '#1a1a1a'; ctx.font = 'bold 11px Noto Sans TC,sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(d.citedRate + '%', x, y);
+  });
+
+  // Legend
+  const lx = W - PAD.right + 12, ly = PAD.top;
+  ctx.font = '10px Noto Sans TC,sans-serif';
+  data.forEach((d, i) => {
+    const ly2 = ly + i * 44;
+    ctx.beginPath(); ctx.arc(lx + 10, ly2 + 8, 8, 0, 2 * Math.PI);
+    ctx.fillStyle = d.color + '55'; ctx.fill();
+    ctx.strokeStyle = d.color; ctx.lineWidth = 2; ctx.stroke();
+    ctx.fillStyle = '#444'; ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+    ctx.fillText(d.label, lx + 22, ly2 + 2);
+    ctx.fillStyle = '#777';
+    ctx.fillText(`追蹤 ${d.tracked} 筆`, lx + 22, ly2 + 14);
+    ctx.fillText(`引用 ${d.citedCount} 筆`, lx + 22, ly2 + 25);
+  });
+})();
+</script>
+</body>
+</html>
