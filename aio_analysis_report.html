@@ -151,6 +151,7 @@ footer { margin-top: 4rem; padding-top: 1.5rem; border-top: 1px solid var(--gray
   <a class="nav-dot" href="#sec-08"><span class="nav-dot-label">07 機會觀察</span><span class="nav-dot-circle"></span></a>
   <a class="nav-dot" href="#sec-action"><span class="nav-dot-label">編輯建議</span><span class="nav-dot-circle"></span></a>
   <a class="nav-dot" href="#sec-appendix"><span class="nav-dot-label">附錄</span><span class="nav-dot-circle"></span></a>
+  <a class="nav-dot" href="#sec-faq"><span class="nav-dot-label">FAQ</span><span class="nav-dot-circle"></span></a>
 </nav>
 
 <div class="page">
@@ -399,6 +400,73 @@ footer { margin-top: 4rem; padding-top: 1.5rem; border-top: 1px solid var(--gray
       </tbody>
     </table>
     <div class="note-box">此文章可作為好眠版位其他文章的升級模板——H2 全面問句化、引用官方來源、一篇覆蓋同主題多種長尾問法，是複製成功的核心策略。</div>
+  </section>
+
+  <!-- AIO FAQ -->
+  <section class="section" id="sec-faq" style="margin-top:3rem;">
+    <div class="section-header">
+      <span class="section-num" style="color:var(--teal-light);">FAQ</span>
+      <h2 class="section-title">AIO 排名追蹤常見問題</h2>
+    </div>
+
+    <div style="background:var(--white);border:1px solid var(--gray-300);border-radius:8px;overflow:hidden;">
+
+      <!-- Q1 -->
+      <div style="padding:1.25rem 1.5rem;border-bottom:1px solid var(--gray-100);">
+        <div style="display:flex;gap:0.75rem;align-items:flex-start;margin-bottom:0.75rem;">
+          <span style="flex-shrink:0;background:var(--gray-900);color:var(--white);font-size:10px;font-weight:700;padding:3px 8px;border-radius:3px;letter-spacing:0.06em;margin-top:2px;">Q</span>
+          <div style="font-size:14px;font-weight:600;color:var(--gray-900);">用無痕模式可以查到「最標準」的 AIO 結果嗎？</div>
+        </div>
+        <div style="display:flex;gap:0.75rem;align-items:flex-start;">
+          <span style="flex-shrink:0;background:var(--teal-dark);color:var(--white);font-size:10px;font-weight:700;padding:3px 8px;border-radius:3px;letter-spacing:0.06em;margin-top:2px;">A</span>
+          <div style="font-size:13px;color:var(--gray-700);line-height:1.7;">
+            <strong style="color:var(--gray-900);">沒辦法。</strong>無痕模式只是「不讀取過去的 Cookie 與瀏覽紀錄」，並不能產出絕對標準的搜尋結果。AIO 的生成機制非常動態，即使在無痕模式下，結果依然會浮動，甚至可能完全不顯示。
+          </div>
+        </div>
+      </div>
+
+      <!-- 4 factors -->
+      <div style="padding:1.25rem 1.5rem;background:var(--gray-50);">
+        <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray-500);margin-bottom:1rem;">無痕模式下仍會影響 AIO 的 4 個因素</div>
+        <div style="display:flex;flex-direction:column;gap:0.85rem;">
+
+          <div style="display:flex;gap:1rem;align-items:flex-start;">
+            <div style="flex-shrink:0;width:28px;height:28px;background:var(--teal-dark);color:var(--white);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;">1</div>
+            <div>
+              <div style="font-size:13px;font-weight:700;color:var(--gray-900);margin-bottom:2px;">搜尋意圖判定變難</div>
+              <div style="font-size:12px;color:var(--gray-700);line-height:1.6;">AIO 依賴過去的搜尋習慣判斷使用者的真實意圖。無痕模式下 Google 失去這些依據，若無法 100% 確定目的，系統往往選擇<strong>直接不顯示 AIO</strong>，以避免給出錯誤答案。</div>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:1rem;align-items:flex-start;">
+            <div style="flex-shrink:0;width:28px;height:28px;background:var(--teal-dark);color:var(--white);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;">2</div>
+            <div>
+              <div style="font-size:13px;font-weight:700;color:var(--gray-900);margin-bottom:2px;">地理位置仍會被讀取（IP）</div>
+              <div style="font-size:12px;color:var(--gray-700);line-height:1.6;">無痕模式依然抓取連線 IP。在台北或高雄連線、使用不同網路供應商，AIO 給出的來源與排序都會產生<strong>微妙差異</strong>。</div>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:1rem;align-items:flex-start;">
+            <div style="flex-shrink:0;width:28px;height:28px;background:var(--teal-dark);color:var(--white);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;">3</div>
+            <div>
+              <div style="font-size:13px;font-weight:700;color:var(--gray-900);margin-bottom:2px;">系統隨機分組（A/B 測試）</div>
+              <div style="font-size:12px;color:var(--gray-700);line-height:1.6;">Google 隨時在進行演算法測試。每次開新的無痕視窗，系統可能將你分配到<strong>不同測試群組</strong>，這就是為什麼「關掉重開再搜一次」，AIO 來源可能完全洗牌或消失。</div>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:1rem;align-items:flex-start;">
+            <div style="flex-shrink:0;width:28px;height:28px;background:var(--teal-dark);color:var(--white);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;">4</div>
+            <div>
+              <div style="font-size:13px;font-weight:700;color:var(--gray-900);margin-bottom:2px;">裝置型號無法隱藏（User-Agent）</div>
+              <div style="font-size:12px;color:var(--gray-700);line-height:1.6;">無痕模式無法隱藏裝置型號。手機版與桌機版觸發的 AIO 介面、長度與來源數量<strong>有顯著差異</strong>——行動裝置通常會大幅壓縮資訊量。</div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="note-box" style="margin-top:1rem;">結論：AIO 沒有「絕對標準」的查法。本報告採用固定時間點批次記錄的方式取得快照，是目前相對可比較的追蹤方法。</div>
+      </div>
+    </div>
   </section>
 
   <footer><span>健康2.0 SEO 內容策略團隊</span><span>2026</span></footer>
